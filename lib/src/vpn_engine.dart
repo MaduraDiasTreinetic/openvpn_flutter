@@ -164,7 +164,7 @@ class OpenVPN {
             if (connectedOn == null) return VpnStatus.empty();
             return VpnStatus(
               connectedOn: connectedOn,
-              duration: _duration(DateTime.now().difference(connectedOn).abs()),
+              //duration: _duration(DateTime.now().difference(connectedOn).abs()),
               packetsIn: splitted[1],
               packetsOut: splitted[2],
               byteIn: splitted[3],
@@ -184,7 +184,7 @@ class OpenVPN {
             if (connectedOn == null) return VpnStatus.empty();
             return VpnStatus(
               connectedOn: connectedOn,
-              duration: _duration(DateTime.now().difference(connectedOn).abs()),
+              // duration: _duration(DateTime.now().difference(connectedOn).abs()),
               byteIn: byteIn,
               byteOut: byteOut,
               packetsIn: byteIn,
