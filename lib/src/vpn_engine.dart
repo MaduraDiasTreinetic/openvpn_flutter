@@ -161,7 +161,7 @@ class OpenVPN {
           if (Platform.isIOS) {
             var splitted = value.split("_");
             var connectedOn = DateTime.tryParse(splitted[0]);
-            if (connectedOn == null) return VpnStatus.empty();
+            // if (connectedOn == null) return VpnStatus.empty();
             return VpnStatus(
               connectedOn: connectedOn,
               //duration: _duration(DateTime.now().difference(connectedOn).abs()),
@@ -181,7 +181,7 @@ class OpenVPN {
                 data["byte_out"] != null ? data["byte_out"].toString() : "0";
             if (byteIn.trim().isEmpty) byteIn = "0";
             if (byteOut.trim().isEmpty) byteOut = "0";
-            if (connectedOn == null) return VpnStatus.empty();
+            // if (connectedOn == null) return VpnStatus.empty();
             return VpnStatus(
               connectedOn: connectedOn,
               // duration: _duration(DateTime.now().difference(connectedOn).abs()),
