@@ -62,6 +62,7 @@ class OpenVPN {
   DateTime? _tempDateTime;
 
   var connectedOn;
+  var connectionDuration;
 
   /// is a listener to see vpn status detail
   final Function(VpnStatus? data)? onVpnStatusChanged;
@@ -135,6 +136,7 @@ class OpenVPN {
   void disconnect() {
     _tempDateTime = null;
     connectedOn = null;
+    connectionDuration = null;
     _channelControl.invokeMethod("disconnect");
     if (_vpnStatusTimer?.isActive ?? false) {
       _vpnStatusTimer?.cancel();
@@ -163,7 +165,7 @@ class OpenVPN {
 
           if (Platform.isIOS) {
             var splitted = value.split("_");
-            connectedOn  = DateTime.tryParse(splitted[0]);
+            connectedOn = DateTime.tryParse(splitted[0]);
             if (connectedOn == null) return VpnStatus.empty();
             return VpnStatus(
               connectedOn: connectedOn,
@@ -175,9 +177,8 @@ class OpenVPN {
             );
           } else if (Platform.isAndroid) {
             var data = jsonDecode(value);
-             connectedOn =
-                DateTime.tryParse(data["connected_on"].toString()) ??
-                    _tempDateTime;
+            connectedOn = DateTime.tryParse(data["connected_on"].toString()) ??
+                _tempDateTime;
             String byteIn =
                 data["byte_in"] != null ? data["byte_in"].toString() : "0";
             String byteOut =
@@ -185,9 +186,13 @@ class OpenVPN {
             if (byteIn.trim().isEmpty) byteIn = "0";
             if (byteOut.trim().isEmpty) byteOut = "0";
 
+            print('Connected on time --->$connectedOn');
+            connectionDuration =
+                _duration(DateTime.now().difference(connectedOn).abs());
+            print('Connection duration--->$connectionDuration');
             return VpnStatus(
               connectedOn: connectedOn,
-              duration: _duration(DateTime.now().difference(connectedOn).abs()),
+              duration: connectionDuration,
               byteIn: byteIn,
               byteOut: byteOut,
               packetsIn: byteIn,
@@ -238,7 +243,6 @@ class OpenVPN {
 
   ///Convert duration that produced by native side as Connection Time
   String _duration(Duration duration) {
-    
     String twoDigits(int n) => n.toString().padLeft(2, "0");
     String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
     String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
