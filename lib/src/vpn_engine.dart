@@ -61,6 +61,8 @@ class OpenVPN {
   ///Use tempDateTime to countdown, especially on android that has delays
   DateTime? _tempDateTime;
 
+  var connectedOn;
+
   /// is a listener to see vpn status detail
   final Function(VpnStatus? data)? onVpnStatusChanged;
 
@@ -132,6 +134,7 @@ class OpenVPN {
   ///Disconnect from VPN
   void disconnect() {
     _tempDateTime = null;
+    connectedOn = null;
     _channelControl.invokeMethod("disconnect");
     if (_vpnStatusTimer?.isActive ?? false) {
       _vpnStatusTimer?.cancel();
@@ -160,7 +163,7 @@ class OpenVPN {
 
           if (Platform.isIOS) {
             var splitted = value.split("_");
-            var connectedOn = DateTime.tryParse(splitted[0]);
+            connectedOn  = DateTime.tryParse(splitted[0]);
             if (connectedOn == null) return VpnStatus.empty();
             return VpnStatus(
               connectedOn: connectedOn,
@@ -172,7 +175,7 @@ class OpenVPN {
             );
           } else if (Platform.isAndroid) {
             var data = jsonDecode(value);
-            var connectedOn =
+             connectedOn =
                 DateTime.tryParse(data["connected_on"].toString()) ??
                     _tempDateTime;
             String byteIn =
@@ -181,7 +184,7 @@ class OpenVPN {
                 data["byte_out"] != null ? data["byte_out"].toString() : "0";
             if (byteIn.trim().isEmpty) byteIn = "0";
             if (byteOut.trim().isEmpty) byteOut = "0";
-             if (connectedOn == null) return VpnStatus.empty();
+
             return VpnStatus(
               connectedOn: connectedOn,
               duration: _duration(DateTime.now().difference(connectedOn).abs()),
@@ -235,6 +238,7 @@ class OpenVPN {
 
   ///Convert duration that produced by native side as Connection Time
   String _duration(Duration duration) {
+    
     String twoDigits(int n) => n.toString().padLeft(2, "0");
     String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
     String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
